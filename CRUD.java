@@ -4,7 +4,7 @@ import java.util.List;
 
 public class CRUD {
 
-    public class ProdutoDAO implements ProdutoDAO {
+    public class ProdutoPostgre implements ProdutoDAO {
         private Connection connection;
 
         public ProdutoDAO() {
@@ -21,84 +21,43 @@ public class CRUD {
         }
 
         @Override
-        public void adicionarProduto(Produto produto) {
-            String sql = "INSERT INTO Produtos (nome, email) VALUES (?, ?)";
-
-            try {
-                PreparedStatement statement = connection.prepareStatement(sql);
+        public void createProduto(Produto produto){
+            String create = "insert into produtos (nome, quantidade) values (?,?)";
+            try{
+                PreparedStatement statement = connection.prepareStatement(create);
                 statement.setString(1, produto.getNome());
-                statement.setString(2, produto.getEmail());
+                statement.setString(2, produto.getQuantidade());
                 statement.executeUpdate();
                 statement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
+            }
+            catch (Exception e) {
+                System.out.printl(e)
             }
         }
-
         @Override
-        public Produto buscarProduto(int id) {
-            String sql = "SELECT * FROM Produtos WHERE id = ?";
-
+        public List<Produto> findTodosProdutos() {
+            List<Produto> produtos = new ArrayList<>();
+            String read = "select * from produtos order by nome";
             try {
-                PreparedStatement statement = connection.prepareStatement(sql);
-                statement.setInt(1, id);
-                ResultSet resultSet = statement.executeQuery();
+                PreparedStatement statement = connection.prepareStatement(read);
+                ResultSet resultset = statement.executeQuery();
 
-                if (resultSet.next()) {
+                while(resultset.next()){
                     Produto produto = new Produto();
-                    produto.setId(resultSet.getInt("id"));
-                    produto.setNome(resultSet.getString("nome"));
-                    produto.setEmail(resultSet.getString("email"));
+                    produto.setId(resultset.getInt("id"));
+                    produto.setNome(resultset.getString("nome"));
+                    produto.setQuantidade(resultset.getInt("quantidade"));
 
-                    return produto;
+                    produtos.add(produto);
                 }
-
-                resultSet.close();
-                statement.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-    @Override
-    public List<Produto> buscarTodosProdutos() {
-        List<Produto> produtos = new ArrayList<>();
-        String sql = "SELECT * FROM Produtos";
-        
-        try {
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(sql);
-            
-            while (resultSet.next()) {
-                Produto produto = new Produto();
-                produto.setId(resultSet.getInt("id"));
-                produto.setNome(resultSet.getString("nome"));
-                produto.setEmail(resultSet.getString("email"));
                 
-                produtos.add(produto);
+                resultset.close();
+                statement.close();
+
+            } catch (Exception e) {
+                System.out.printl(e);
+                return null;
             }
-            
-            resultSet.close();
-            statement.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-        
-        return produtos;
-    }
 
-    @Override
-    public void atualizarProduto(Produto produto) {
-        String sql = "UPDATE Produtos SET nome = ?, email = ? WHERE id = ?";
-        
-        try {
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, produto.getNome());
-            statement.setString(2, produto.getEmail());
-            statement.setInt(3, produto.getId());
-            statement.executeUpdate();
-            statement.close
 
-}
