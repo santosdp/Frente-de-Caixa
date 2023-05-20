@@ -1,13 +1,13 @@
 import java.util.List;
 
 public interface ProdutoDAO {
-    void adicionarProduto(Produto produto);
+    void createProduto(Produto produto);
 
-    Produto buscarProduto(int id);
+    Produto findProduto(int id);
 
-    List<Produto> buscarTodosProdutos();
+    List<Produto> findTodosProdutos();
 
-    void atualizarProduto(Produto produto);
+    void updateProduto(Produto produto);
 
-    void deletarProduto(int id);
+    void deleteProduto(int id);
 }
