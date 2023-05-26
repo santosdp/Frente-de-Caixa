@@ -22,12 +22,14 @@ public class CRUD {
 
         @Override
         public void adicionarProduto(Produto produto) {
-            String sql = "INSERT INTO Produtos (nome, email) VALUES (?, ?)";
+            String create = "INSERT INTO Produtos (id, nome, quantidade, preco) VALUES (?, ?, ?, ?)";
 
             try {
-                PreparedStatement statement = connection.prepareStatement(sql);
-                statement.setString(1, produto.getNome());
-                statement.setString(2, produto.getEmail());
+                PreparedStatement statement = connection.prepareStatement(create);
+                statement.setInt(1, produto.getId());
+                statement.setString(2, produto.getNome());
+                statement.setInt(3, produto.getQuantidade());
+                statement.setFloat(4, produto.getPreco());
                 statement.executeUpdate();
                 statement.close();
             } catch (SQLException e) {
@@ -37,10 +39,10 @@ public class CRUD {
 
         @Override
         public Produto buscarProduto(int id) {
-            String sql = "SELECT * FROM Produtos WHERE id = ?";
+            String read = "SELECT * FROM Produtos WHERE id = ?";
 
             try {
-                PreparedStatement statement = connection.prepareStatement(sql);
+                PreparedStatement statement = connection.prepareStatement(read);
                 statement.setInt(1, id);
                 ResultSet resultSet = statement.executeQuery();
 
@@ -48,7 +50,8 @@ public class CRUD {
                     Produto produto = new Produto();
                     produto.setId(resultSet.getInt("id"));
                     produto.setNome(resultSet.getString("nome"));
-                    produto.setEmail(resultSet.getString("email"));
+                    produto.setQuantidade(resultSet.getInt("quantidade"));
+                    produto.setPreco(resultSet.getFloat("preco"));
 
                     return produto;
                 }
@@ -65,17 +68,18 @@ public class CRUD {
     @Override
     public List<Produto> buscarTodosProdutos() {
         List<Produto> produtos = new ArrayList<>();
-        String sql = "SELECT * FROM Produtos";
+        String readAll = "SELECT * FROM Produtos";
         
         try {
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(sql);
+            ResultSet resultSet = statement.executeQuery(readAll);
             
             while (resultSet.next()) {
                 Produto produto = new Produto();
                 produto.setId(resultSet.getInt("id"));
                 produto.setNome(resultSet.getString("nome"));
-                produto.setEmail(resultSet.getString("email"));
+                produto.setQuantidade(resultSet.getInt("quantidade"));
+                produto.setPreco(resultSet.getFloat("preco"));
                 
                 produtos.add(produto);
             }
@@ -91,13 +95,14 @@ public class CRUD {
 
     @Override
     public void atualizarProduto(Produto produto) {
-        String sql = "UPDATE Produtos SET nome = ?, email = ? WHERE id = ?";
+        String update = "UPDATE Produtos SET nome = ?, quantidade = ?, preco = ? WHERE id = ?";
         
         try {
-            PreparedStatement statement = connection.prepareStatement(sql);
+            PreparedStatement statement = connection.prepareStatement(update);
             statement.setString(1, produto.getNome());
-            statement.setString(2, produto.getEmail());
-            statement.setInt(3, produto.getId());
+            statement.setInt(2, produto.getQuantidade());
+            statement.setFloat(3, produto.getPreco());
+            statement.setInt(4, produto.getId());
             statement.executeUpdate();
             statement.close
 
