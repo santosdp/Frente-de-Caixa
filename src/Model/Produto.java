@@ -8,7 +8,14 @@ package model;
 public class Produto{
     private int codigo, quantidade;
     private String nome;
-    private float preco;
+    private double preco;
+    
+    public Produto(int codigo, String nome, int quantidade, double preco){
+        this.codigo = codigo;
+        this.nome = nome;
+        this.quantidade = quantidade;
+        this.preco = preco;
+    }
 
     public void setCodigo(int codigo){
         this.codigo = codigo;
@@ -31,10 +38,10 @@ public class Produto{
         return this.quantidade;
     }
 
-    public void setPreco(float preco){
+    public void setPreco(double preco){
         this.preco = preco;
     }
-    public float getPreco(){
+    public double getPreco(){
         return this.preco;
     }
 }

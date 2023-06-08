@@ -1,7 +1,5 @@
 package model;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -32,7 +30,7 @@ public class Model implements ProdutoDAO{
             statement.setInt(1, produto.getCodigo());
             statement.setString(2, produto.getNome());
             statement.setInt(3, produto.getQuantidade());
-            statement.setFloat(4, produto.getPreco());
+            statement.setDouble(4, produto.getPreco());
             statement.executeUpdate();
             statement.close();
         } catch (SQLException e) {
@@ -41,31 +39,26 @@ public class Model implements ProdutoDAO{
     }
 
     @Override
-    public List<Produto> procurarProduto(){
-        List<Produto> produtos = new ArrayList<>();
-        String readAll = "SELECT * FROM Produtos";
+    public Produto procurarProduto(int codigo){
+        String read = "SELECT * FROM usuarios WHERE codigo = ?";
 
         try {
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(readAll);
-
-            while (resultSet.next()) {
-                Produto produto = new Produto();
-                produto.setCodigo(resultSet.getInt("codigo"));
-                produto.setNome(resultSet.getString("nome"));
-                produto.setQuantidade(resultSet.getInt("quantidade"));
-                produto.setPreco(resultSet.getFloat("preco"));
-
-                produtos.add(produto);
+            PreparedStatement statement = connection.prepareStatement(read);
+            statement.setInt(1, codigo);
+            ResultSet resultSet = statement.executeQuery();
+            
+            if (resultSet.next()){
+                int codigoProduto = resultSet.getInt("codigo");
+                String nomeProduto = resultSet.getString("nome");
+                int quantidadeProduto = resultSet.getInt("quantidade");
+                double precoProduto = resultSet.getDouble("preco");
+                return new Produto(codigoProduto, nomeProduto, quantidadeProduto, precoProduto);
             }
-
-            resultSet.close();
-            statement.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return produtos;
+        return null;
     }
 
     @Override
@@ -76,7 +69,7 @@ public class Model implements ProdutoDAO{
             PreparedStatement statement = connection.prepareStatement(update);
             statement.setString(1, produto.getNome());
             statement.setInt(2, produto.getQuantidade());
-            statement.setFloat(3, produto.getPreco());
+            statement.setDouble(3, produto.getPreco());
             statement.setInt(4, produto.getCodigo());
             statement.executeUpdate();
             statement.close();

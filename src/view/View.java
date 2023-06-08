@@ -2,8 +2,11 @@ package view;
 import model.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import javax.swing.table.TableColumnModel;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,14 +16,16 @@ import java.util.List;
 public class View{
     private JFrame frame;
     private JTextField codigoCreateField , nomeCreateField, quantidadeCreateField, precoCreateField;
-    private JTextField codigoReadField;
     private JTextField codigoUpdateField, nomeUpdateField, quantidadeUpdateField, precoUpdateField;
     private JTextField codigoDeleteField;
     private JTable tabela;
     private DefaultTableModel tableModel;
-    private JButton criarButton, procurarButton, atualizarButton, excluirButton;
+    private JButton criarButton, atualizarButton, excluirButton;
+    private JTextField produtoFrenteField, quantidadeFrenteField, totalFrenteField;
+    private JComboBox pagamentoFrenteField;
+    private JButton cancelarFrenteButton, confirmarFrenteButton, removerFrenteButton, addFrenteButton;
     
-    public View() {
+    public View(){
         frame = new JFrame("Frente de Caixa");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -34,8 +39,8 @@ public class View{
         JPanel painel4 = new JPanel();
 
         // Adicione os painéis ao JTabbedPane com rótulos para cada aba
+        tabbedPane.addTab("Home", painel2);
         tabbedPane.addTab("Adicionar", painel1);
-        tabbedPane.addTab("Procurar", painel2);
         tabbedPane.addTab("Atualizar", painel3);
         tabbedPane.addTab("Excluir", painel4);
         
@@ -114,44 +119,131 @@ public class View{
         criarButton.setBorder(BorderFactory.createLineBorder(new Color(70,130,180)));
         
         
-        // Elementos do Painel "Procurar"
-        JLabel descricaoRead1 = new JLabel("Bem-vindo à sessão de Procurar Produto");
-        descricaoRead1.setFont(new Font("Arial", Font.BOLD, 18));
-        JLabel descricaoRead2 = new JLabel("Digite o código do produto que deseja pesquisar.");
-        codigoReadField = new JTextField(5);
-        JLabel codigoReadLabel = new JLabel("Código:");
-        procurarButton = new JButton("Procurar");
-        tableModel = new DefaultTableModel(new Object[]{ "Código", "Nome", "Quantidade", "Preço"}, 0);
+        // Elementos do Painel "Home"
+        String[] pagamentoFrenteFieldItems = {"Dinheiro", "Pix", "Cartão de Débito", "Cartão de Crédito"};
+        JLabel produtoFrenteLabel = new JLabel ("CÓDIGO DO PRODUTO");
+        JLabel quantidadeFrenteLabel = new JLabel ("QUANTIDADE");
+        JLabel pagamentoFrenteLabel = new JLabel ("PAGAMENTO");
+        produtoFrenteField = new JTextField (5);
+        quantidadeFrenteField = new JTextField (5);
+        quantidadeFrenteField.setText("1");
+        pagamentoFrenteField = new JComboBox (pagamentoFrenteFieldItems);
+        cancelarFrenteButton = new JButton ("X CANCELAR");
+        confirmarFrenteButton = new JButton ("CONFIRMAR");
+        removerFrenteButton = new JButton("REMOVER");
+        addFrenteButton = new JButton ("+");
+        tableModel = new DefaultTableModel();
         tabela = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(tabela);
+        tableModel.addColumn("CÓDIGO");
+        tableModel.addColumn("QTD");
+        tableModel.addColumn("PRODUTO");
+        tableModel.addColumn("VL. UNID");
+        tableModel.addColumn("VL TOTAL");
         
-        // Adicionando os elemetnos no Painel "Procurar"
-        painel2.add(descricaoRead1);
-        painel2.add(descricaoRead2);
-        painel2.add(codigoReadLabel);
-        painel2.add(codigoReadField);
-        painel2.add(procurarButton);
+        JPanel totalFrente = new JPanel();
+        JLabel descricaototalFrente = new JLabel("  TOTAL:");
+        JLabel moedaFrente = new JLabel("R$ ");
+        totalFrenteField = new JTextField(6);
+        totalFrenteField.setText("0.00");
+        
+        //Propriedade
+        totalFrenteField.setEnabled(false);
+        
+        //
+        totalFrente.setLayout(new BorderLayout());
+        totalFrente.add(descricaototalFrente, BorderLayout.WEST);
+        totalFrente.add(moedaFrente, BorderLayout.EAST);
+        totalFrente.add(totalFrenteField, BorderLayout.EAST);
+        
+        // Adicionando componentes
+        painel2.add(produtoFrenteLabel);
+        painel2.add(quantidadeFrenteLabel);
+        painel2.add(quantidadeFrenteField);
+        painel2.add(pagamentoFrenteField);
+        painel2.add(pagamentoFrenteLabel);
+        painel2.add(cancelarFrenteButton);
+        painel2.add(confirmarFrenteButton);
+        painel2.add(produtoFrenteField);
+        painel2.add(addFrenteButton);
+        painel2.add(removerFrenteButton);
         painel2.add(scrollPane);
+        painel2.add(totalFrente);
         
-        // Posicionamento dos elementos no Painel "Procurar"
-        descricaoRead1.setBounds (120, 35, 400, 35);
-        descricaoRead2.setBounds (150, 65, 355, 40);
-        codigoReadLabel.setBounds (180, 110, 50, 25);
-        codigoReadField.setBounds (225, 110, 75, 25);
-        procurarButton.setBounds(305, 110, 60, 25);
-        scrollPane.setBounds (150, 150, 300, 200);
+        // Posicionando
+        produtoFrenteLabel.setBounds (130, 10, 200, 25);
+        produtoFrenteField.setBounds (130, 35, 575, 35);
+        quantidadeFrenteLabel.setBounds (15, 10, 100, 25);
+        quantidadeFrenteField.setBounds (15, 35, 100, 35);
+        pagamentoFrenteField.setBounds (15, 435, 150, 30);
+        pagamentoFrenteLabel.setBounds (15, 410, 200, 25);
+        cancelarFrenteButton.setBounds (300, 480, 140, 35);
+        confirmarFrenteButton.setBounds (620, 480, 140, 35);
+        removerFrenteButton.setBounds (460, 480, 140, 35);
+        addFrenteButton.setBounds (720, 35, 41, 35);
+        scrollPane.setBounds (300, 85, 460, 325);
+        totalFrente.setBounds(300, 425, 460, 40);
+        moedaFrente.setBounds(350, 0, 30, 40);
         
-        // Definição de cor de fundo e de letras
-        painel2.setBackground(new Color(70,130,180));
-        descricaoRead1.setForeground(new Color(255, 255, 255));
-        descricaoRead2.setForeground(new Color(255, 255, 255));
-        codigoReadLabel.setForeground(new Color(255, 255, 255));
-        codigoReadField.setBackground(new Color(176,196,222));
-        scrollPane.getViewport().setBackground(new Color(176,196,222));
+        // Definindo tamanho das celulas da tabela
+        TableColumnModel columnModel = tabela.getColumnModel();
+        columnModel.getColumn(0).setPreferredWidth(45);
+        columnModel.getColumn(1).setPreferredWidth(10);
+        columnModel.getColumn(2).setPreferredWidth(175);
+        columnModel.getColumn(3).setPreferredWidth(40);
+        columnModel.getColumn(4).setPreferredWidth(55);
         
-        // Adição de Bordas
-        codigoReadField.setBorder(BorderFactory.createLineBorder(new Color(70,130,180)));
-        procurarButton.setBorder(BorderFactory.createLineBorder(new Color(70,130,180)));
+        tabela.setRowHeight(30);
+        
+        //
+        painel2.setBackground(new Color(230,230,230));
+        confirmarFrenteButton.setBackground(new Color(49,148,109));
+        cancelarFrenteButton.setBackground(new Color(247,247,247));
+        removerFrenteButton.setBackground(new Color(230,94,94));
+        addFrenteButton.setBackground(new Color(247,247,247));
+        produtoFrenteField.setBackground(new Color(253,252,224));
+        tabela.setBackground(new Color(247,247,247));
+        totalFrente.setBackground(new Color(226,46,0));
+        totalFrenteField.setBackground(new Color(226,46,0));
+        pagamentoFrenteField.setBackground(new Color(247,247,247));
+        
+        
+        //
+        confirmarFrenteButton.setBorder(BorderFactory.createLineBorder(new Color(160,160,160), 2));
+        cancelarFrenteButton.setBorder(BorderFactory.createLineBorder(new Color(160,160,160), 2));
+        removerFrenteButton.setBorder(BorderFactory.createLineBorder(new Color(160,160,160), 2));
+        quantidadeFrenteField.setBorder(BorderFactory.createLineBorder(new Color(160,160,160)));
+        produtoFrenteField.setBorder(BorderFactory.createLineBorder(new Color(240,73,10), 2));
+        addFrenteButton.setBorder(BorderFactory.createLineBorder(new Color(160,160,160), 2));
+        totalFrenteField.setBorder(BorderFactory.createLineBorder(new Color(226,46,0)));
+        scrollPane.setBorder(BorderFactory.createDashedBorder(Color.BLACK, 5, 5));
+        
+        JTableHeader tabelaHeader = tabela.getTableHeader();
+        
+        //
+        produtoFrenteLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        quantidadeFrenteLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        pagamentoFrenteLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        confirmarFrenteButton.setFont(new Font("Arial", Font.BOLD, 14));
+        removerFrenteButton.setFont(new Font("Arial", Font.BOLD, 14));
+        cancelarFrenteButton.setFont(new Font("Arial", Font.BOLD, 14));
+        produtoFrenteField.setFont(new Font("Arial", Font.BOLD, 14));
+        quantidadeFrenteField.setFont(new Font("Arial", Font.BOLD, 14));
+        tabelaHeader.setFont(new Font("Arial", Font.BOLD, 14));
+        descricaototalFrente.setFont(new Font("Arial", Font.BOLD, 20));
+        moedaFrente.setFont(new Font("Arial", Font.BOLD, 16));
+        totalFrenteField.setFont(new Font("Arial", Font.BOLD, 16));
+        
+        //
+        produtoFrenteField.setForeground(new Color(142,161,176));
+        confirmarFrenteButton.setForeground(Color.WHITE);
+        removerFrenteButton.setForeground(Color.WHITE);
+        descricaototalFrente.setForeground(new Color(247,247,247));
+        moedaFrente.setForeground(new Color(247,247,247));
+        quantidadeFrenteField.setForeground(new Color(0,0,0));
+        produtoFrenteField.setForeground(new Color(0,0,0));
+        produtoFrenteField.setDisabledTextColor(new Color(0,0,0));
+        totalFrenteField.setDisabledTextColor(new Color(247,247,247));
         
         
         // Elementos do Painel "Atualizar"
@@ -254,8 +346,9 @@ public class View{
         
         
         // Defina o tamanho da janela e torne-a visível
-        frame.setSize(600, 480);
+        frame.setSize(new Dimension(800, 600));
         frame.setVisible(true);
+        frame.setResizable(false);
         
     }  
     // Metodos para acessar os dados da interface
@@ -272,9 +365,12 @@ public class View{
     public String getprecoCreate(){
         return precoCreateField.getText();
     }
-    // Dados de "Read"
-    public String getcodigoRead(){
-        return codigoReadField.getText();
+    // Dados de "Home"
+    public String getprodutoFrente(){
+        return produtoFrenteField.getText();
+    }
+    public String getquantidadeFrente(){
+        return quantidadeFrenteField.getText();
     }
     // Dados de "Update"
     public String getcodigoUpdate(){
@@ -294,17 +390,43 @@ public class View{
         return codigoDeleteField.getText();
     }
     // Métodos para interagir com a tabela de produtos procurados
-    public int getLinhaSelecionada(){
-        return tabela.getSelectedRow();
+    public int getLinhasTabela(){
+        return tableModel.getRowCount();
     }
-    public void atualizarTabela(List<Produto> produtos){
+    public void adicionarTabela(Produto produto){
         tableModel.setRowCount(0);
-        for(Produto produto : produtos){
-            Object[] row = {produto.getCodigo(), produto.getNome(), produto.getQuantidade(), produto.getPreco()};
-            tableModel.addRow(row);
+        Object[] row = { produto.getCodigo(), produto.getQuantidade(), produto.getNome(), (Math.round(produto.getPreco() *100.0)/100.0) , (Math.round((produto.getQuantidade())*(produto.getPreco()) *100.0)/100.0)};
+        tableModel.addRow(row);
+    }
+    public void removerUltimoTabela(){
+        int coluna = tableModel.getRowCount();
+        tableModel.removeRow(coluna-1);
+    }
+    public void removerTabela(){
+        int coluna = tableModel.getRowCount();
+        for(int i = 1; i < coluna; i++){
+            tableModel.removeRow(i);
         }
     }
-    
+    public void setTotal(String preco){
+        totalFrenteField.setText(preco);
+    }
+    public String getTotal(){
+        return totalFrenteField.getText();
+    }
+    public List<Produto> listaTabela(){
+        List<Produto> produtos = new ArrayList<>();
+        int linhas = tableModel.getRowCount();
+        for(int i = 0; i < linhas; i++){
+            int codigo = (int)(tableModel.getValueAt(i, 0));
+            int quantidade = (int)(tableModel.getValueAt(i, 1));
+            String nome = (tableModel.getValueAt(i, 2)).toString();
+            double preco = (double)(tableModel.getValueAt(i, 3));
+            Produto produto = new Produto(codigo, nome, quantidade, preco);
+            produtos.add(produto);
+        }
+        return produtos;
+    }
     // Adição de eventos para serem usados no Controller
     // Função de exibição de mensagem de alerta
     public void MostraMensagem(String text){
@@ -316,20 +438,30 @@ public class View{
         nomeCreateField.setText("");
         quantidadeCreateField.setText("");
         precoCreateField.setText("");
-        codigoReadField.setText("");
         codigoUpdateField.setText("");
         nomeUpdateField.setText("");
         quantidadeUpdateField.setText("");
         precoUpdateField.setText("");
         codigoDeleteField.setText("");
+        produtoFrenteField.setText("");
+        quantidadeFrenteField.setText("1");
     }
     // Evento de criar produto ao apertar o botão
     public void addCriarListener(ActionListener listener){
         criarButton.addActionListener(listener);
     }
     // Evento de procurar produto ao apertar o botão
-    public void addProcurarListener(ActionListener listener){
-        procurarButton.addActionListener(listener);
+    public void addFrenteListener(ActionListener listener){
+        addFrenteButton.addActionListener(listener);
+    }
+    public void confirmarFrenteListener(ActionListener listener){
+        confirmarFrenteButton.addActionListener(listener);
+    }
+    public void removerFrenteListener(ActionListener listener){
+        removerFrenteButton.addActionListener(listener);
+    }
+    public void cancelarFrenteListener(ActionListener listener){
+        cancelarFrenteButton.addActionListener(listener);
     }
     // Evento de atualizar produto ao apertar o botão
     public void addAtualizarListener(ActionListener listener){
@@ -340,9 +472,5 @@ public class View{
         excluirButton.addActionListener(listener);
     }
     
-    public static void main(String[] args) {
-        // Crie uma instância da janela
-        View janela = new View();
-    }
 }
 
