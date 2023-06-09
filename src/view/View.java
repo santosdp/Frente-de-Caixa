@@ -394,17 +394,16 @@ public class View{
         return tableModel.getRowCount();
     }
     public void adicionarTabela(Produto produto){
-        tableModel.setRowCount(0);
         Object[] row = { produto.getCodigo(), produto.getQuantidade(), produto.getNome(), (Math.round(produto.getPreco() *100.0)/100.0) , (Math.round((produto.getQuantidade())*(produto.getPreco()) *100.0)/100.0)};
         tableModel.addRow(row);
     }
     public void removerUltimoTabela(){
-        int coluna = tableModel.getRowCount();
-        tableModel.removeRow(coluna-1);
+        int linhas = tableModel.getRowCount();
+        tableModel.removeRow(linhas-1);
     }
     public void removerTabela(){
         int coluna = tableModel.getRowCount();
-        for(int i = 1; i < coluna; i++){
+        for (int i = coluna - 1; i >= 0; i--) {
             tableModel.removeRow(i);
         }
     }
@@ -418,7 +417,7 @@ public class View{
         List<Produto> produtos = new ArrayList<>();
         int linhas = tableModel.getRowCount();
         for(int i = 0; i < linhas; i++){
-            int codigo = (int)(tableModel.getValueAt(i, 0));
+            String codigo = (tableModel.getValueAt(i, 0)).toString();
             int quantidade = (int)(tableModel.getValueAt(i, 1));
             String nome = (tableModel.getValueAt(i, 2)).toString();
             double preco = (double)(tableModel.getValueAt(i, 3));

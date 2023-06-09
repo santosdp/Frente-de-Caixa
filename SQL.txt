@@ -1,0 +1,7 @@
+CREATE DATABASE FrenteCaixa;
+CREATE TABLE produtos (
+    codigo VARCHAR(5) PRIMARY KEY,
+    nome VARCHAR(50),
+    quantidade SMALLINT,
+    preco REAL
+);

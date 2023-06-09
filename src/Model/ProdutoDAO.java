@@ -5,8 +5,8 @@ package model;
  */
 public interface ProdutoDAO{
     void criarProduto(Produto produto);
-    Produto procurarProduto(int codigo);
+    Produto procurarProduto(String codigo);
     void atualizarProduto(Produto produto);
-    void excluirProduto(int codigo);
+    void excluirProduto(String codigo);
 }
 

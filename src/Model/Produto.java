@@ -6,21 +6,22 @@ package model;
  */
 
 public class Produto{
-    private int codigo, quantidade;
+    private String codigo;
     private String nome;
+    private int quantidade;
     private double preco;
     
-    public Produto(int codigo, String nome, int quantidade, double preco){
+    public Produto(String codigo, String nome, int quantidade, double preco){
         this.codigo = codigo;
         this.nome = nome;
         this.quantidade = quantidade;
         this.preco = preco;
     }
 
-    public void setCodigo(int codigo){
+    public void setCodigo(String codigo){
         this.codigo = codigo;
     }
-    public int getCodigo(){
+    public String getCodigo(){
         return this.codigo;
     }
 

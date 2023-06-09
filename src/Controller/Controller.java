@@ -21,30 +21,30 @@ public class Controller {
         view.confirmarFrenteListener(new ConfirmarFrenteListener());
         view.removerFrenteListener(new RemoverFrenteListener());
         view.cancelarFrenteListener(new CancelarFrenteListener());
+        view.addCriarListener(new AdicionarListener());
+        view.addAtualizarListener(new AtualizarListener());
+        view.addExcluirListener(new ExcluirListener());
         
-        atualizaPreco();
     }
     
     class AddFrenteListener implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e){
-            String codigoPre = view.getprodutoFrente();
+            String codigoCarrinho = view.getprodutoFrente();
             String quantidadePre = view.getquantidadeFrente();
             
-            if(codigoPre.length() != 5){
+            Produto produtoEstoque = produtoDAO.procurarProduto(codigoCarrinho);
+            if(produtoEstoque == null){
+                view.MostraMensagem("Produto não existe!");
+                return;
+            }
+            
+            if(codigoCarrinho.length() != 5){
                 view.MostraMensagem("Código de Produto inválido!");
                 return;
             }
             if(quantidadePre.length() > 5){
                 view.MostraMensagem("Quantidade de Produto inválido!");
-                return;
-            }
-            
-            int codigoCarrinho;
-            try{
-                codigoCarrinho = Integer.parseInt(codigoPre);
-            } catch(NumberFormatException ex){
-                view.MostraMensagem("Código de Produto inválido!");
                 return;
             }
             
@@ -60,7 +60,6 @@ public class Controller {
                 return;
             }
             
-            Produto produtoEstoque = produtoDAO.procurarProduto(codigoCarrinho);
             if(produtoEstoque.getQuantidade() < quantidadeCarrinho){
                 view.MostraMensagem("Quantidade em estoque insuficiente.");
                 return;
@@ -113,9 +112,15 @@ public class Controller {
     class CancelarFrenteListener implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e){
-            view.removerTabela();
-            view.limparCampos();
-            view.setTotal("0.00");
+            int quantidade = view.getLinhasTabela();
+            if(quantidade > 0){
+                view.removerTabela();
+                view.limparCampos();
+                view.setTotal("0.00");
+            }
+            else{
+                view.MostraMensagem("Nenhum produto no carrinho.");
+            }
         }
     }
     
@@ -127,12 +132,155 @@ public class Controller {
             view.setTotal("0.00");
         }
         for(Produto produto : produtos){
-            precototal += produto.getPreco();
+            precototal += produto.getPreco() * produto.getQuantidade();
+        }
+        double precoarredondado = (Math.round(precototal *100.0)/100.0);
+        view.setTotal(Double.toString(precoarredondado));
+    }
+    
+    private class AdicionarListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String codigoAdicionar = view.getcodigoCreate();
+            String nomeAdicionar = view.getnomeCreate();
+            String quantidadeAdicionar = view.getquantidadeCreate();
+            String precoAdicionar = view.getprecoCreate();
+            
+            Produto produtoEstoque = produtoDAO.procurarProduto(codigoAdicionar);
+            if(!(produtoEstoque == null)){
+                view.MostraMensagem("Código de produto já cadastrado no sistema!");
+                return;
+            }
+            
+            if(codigoAdicionar.length() != 5){
+                view.MostraMensagem("Código de Produto inválido!");
+                return;
+            }
+            if(nomeAdicionar.length() < 1 && nomeAdicionar.equals(" ")){
+                view.MostraMensagem("Nome de Produto inválido!");
+                return;
+            }
+            if(quantidadeAdicionar.length() > 5){
+                view.MostraMensagem("Quantidade de Produto inválido!");
+                return;
+            }
+            if(precoAdicionar.length() < 1 && precoAdicionar.equals(" ") && precoAdicionar.equals("0")){
+                view.MostraMensagem("Preço de Produto inválido!");
+                return;
+            }
+            
+            
+            int quantidadeCarrinho;
+            try{
+                quantidadeCarrinho = Integer.parseInt(quantidadeAdicionar);
+            } catch(NumberFormatException ex){
+                view.MostraMensagem("Quantidade de Produto inválido!");
+                return;
+            }
+            if(quantidadeCarrinho < 1){
+                view.MostraMensagem("Quantidade de Produto inválido!");
+                return;
+            }
+            double precoCarrinho;
+            try{
+                precoCarrinho = (Math.round(Double.parseDouble(precoAdicionar) *100.0)/100.0);
+            } catch(NumberFormatException ex){
+                view.MostraMensagem("Preço de Produto inválido!");
+                return;
+            }
+            if(precoCarrinho <= 0){
+                view.MostraMensagem("Preço de Produto inválido!");
+                return;
+            }
+            
+
+            Produto produto = new Produto(codigoAdicionar, nomeAdicionar, quantidadeCarrinho, precoCarrinho);
+
+            produtoDAO.criarProduto(produto);
+            view.MostraMensagem("Produto adicionado com sucesso.");
+            view.limparCampos();
         }
     }
     
+    private class AtualizarListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String codigoAtualizar = view.getcodigoUpdate();
+            String nomeAtualizar = view.getnomeUpdate();
+            String quantidadeAtualizar = view.getquantidadeUpdate();
+            String precoAtualizar = view.getprecoUpdate();
+            
+            Produto produtoEstoque = produtoDAO.procurarProduto(codigoAtualizar);
+            if(produtoEstoque == null){
+                view.MostraMensagem("Produto não existe!");
+                return;
+            }
+            if(codigoAtualizar.length() != 5){
+                view.MostraMensagem("Código de Produto inválido!");
+                return;
+            }
+            if(nomeAtualizar.length() < 1 && nomeAtualizar.equals(" ")){
+                view.MostraMensagem("Nome de Produto inválido!");
+                return;
+            }
+            if(quantidadeAtualizar.length() > 5){
+                view.MostraMensagem("Quantidade de Produto inválido!");
+                return;
+            }
+            if(precoAtualizar.length() < 1 && precoAtualizar.equals(" ") && precoAtualizar.equals("0")){
+                view.MostraMensagem("Preço de Produto inválido!");
+                return;
+            }
+            
+            int quantidadeCarrinho;
+            try{
+                quantidadeCarrinho = Integer.parseInt(quantidadeAtualizar);
+            } catch(NumberFormatException ex){
+                view.MostraMensagem("Quantidade de Produto inválido!");
+                return;
+            }
+            if(quantidadeCarrinho < 1){
+                view.MostraMensagem("Quantidade de Produto inválido!");
+                return;
+            }
+            double precoCarrinho;
+            try{
+                precoCarrinho = (Math.round(Double.parseDouble(precoAtualizar) *100.0)/100.0);
+            } catch(NumberFormatException ex){
+                view.MostraMensagem("Preço de Produto inválido!");
+                return;
+            }
+            if(precoCarrinho <= 0){
+                view.MostraMensagem("Preço de Produto inválido!");
+                return;
+            }
+            
+
+            Produto produto = new Produto(codigoAtualizar, nomeAtualizar, quantidadeCarrinho, precoCarrinho);
+
+            produtoDAO.atualizarProduto(produto);
+            view.MostraMensagem("Produto atualizado com sucesso.");
+            view.limparCampos();
+        }
+    }
+    
+    private class ExcluirListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String codigo = view.getcodigoDelete();
+            Produto produtoEstoque = produtoDAO.procurarProduto(codigo);
+            if(produtoEstoque == null){
+                view.MostraMensagem("Código de produto não encontrado no sistema, corrija e tente novamente.");
+            }
+            produtoDAO.excluirProduto(codigo);
+            view.MostraMensagem("Produto excluído com sucesso.");
+            view.limparCampos();
+        }
+    }
+    
+    
     public static void main(String[] args) {
-        ProdutoDAO produtoDAO = new Model();
+        ProdutoDAO produtoDAO = Model.getInstancia();
         View view = new View();
         Controller controller = new Controller(view, produtoDAO);
     }
